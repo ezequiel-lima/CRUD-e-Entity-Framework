@@ -25,6 +25,7 @@ namespace Blog.Services
                 {
                     //chave e valor
                     new Claim(ClaimTypes.Name, value:"quiel"), // User.Identity.Name
+                    new Claim(ClaimTypes.Role, value:"user"),
                     new Claim(ClaimTypes.Role, value:"admin"), // User.IsInRole
                     new Claim("", value:"")
                 }),
