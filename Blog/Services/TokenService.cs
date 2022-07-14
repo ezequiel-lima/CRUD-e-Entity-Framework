@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Claims;
+using Blog.Extensions;
 
 namespace Blog.Services
 {
@@ -17,18 +18,12 @@ namespace Blog.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             // Pegamos a chave
             var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
+            var claims = user.GetClaims();
             // Criamos a especificação desse token 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 // Informações sobre esse token
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    //chave e valor
-                    new Claim(ClaimTypes.Name, value:"quiel"), // User.Identity.Name
-                    new Claim(ClaimTypes.Role, value:"user"),
-                    new Claim(ClaimTypes.Role, value:"admin"), // User.IsInRole
-                    new Claim("", value:"")
-                }),
+                Subject = new ClaimsIdentity(claims),
                 // Define um tempo de duração do token
                 Expires = DateTime.UtcNow.AddHours(8),
                 // Como vai ser gerado e lido depois
