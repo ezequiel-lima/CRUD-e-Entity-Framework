@@ -72,4 +72,5 @@ void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddSwaggerGen();
     builder.Services.AddDbContext<BlogDataContext>();
     builder.Services.AddTransient<TokenService>(); // Sempre criar um novo
+    builder.Services.AddTransient<EmailService>();
 }

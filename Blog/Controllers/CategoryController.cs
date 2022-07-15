@@ -2,6 +2,7 @@
 using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
