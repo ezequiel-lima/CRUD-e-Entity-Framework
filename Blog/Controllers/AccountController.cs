@@ -66,7 +66,6 @@ namespace Blog.Controllers
                 {
                     user = user.Email, 
                     password,
-                    role
                 }));
             }
             catch (DbUpdateException)
