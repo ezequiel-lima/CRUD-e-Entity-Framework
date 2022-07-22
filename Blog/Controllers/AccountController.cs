@@ -3,10 +3,12 @@ using Blog.Extensions;
 using Blog.Models;
 using Blog.Services;
 using Blog.ViewModels;
+using Blog.ViewModels.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecureIdentity.Password;
+using System.Text.RegularExpressions;
 
 namespace Blog.Controllers
 {
@@ -63,7 +65,8 @@ namespace Blog.Controllers
                 return Ok(new ResultViewModel<dynamic>(new
                 {
                     user = user.Email, 
-                    password 
+                    password,
+                    role
                 }));
             }
             catch (DbUpdateException)
@@ -108,6 +111,51 @@ namespace Blog.Controllers
             {
                 return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
             }
+        }
+
+        [Authorize]
+        [HttpPost("v1/accounts/upload-image")]
+        public async Task<IActionResult> UploadImage(
+            [FromBody] UploadImageViewModel model,
+            [FromServices] BlogDataContext context)
+        {
+            // Gera um nome para o arquivo para nunca gerar um nome igual, isso tambem evita cache
+            var fileName = $"{Guid.NewGuid().ToString()}.jpg";
+            // Vai receber a imagem do corpo de requisição 
+            // E essa imagem vem sempre com o inico data:image;base64
+            // Regex esta sendo utilizado para remover 
+            var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(model.Base64Image, "");
+            var bytes = Convert.FromBase64String(data);
+
+            try
+            {
+                await System.IO.File.WriteAllBytesAsync($"wwwroot/images/{fileName}", bytes);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+
+            var user = await context
+                .Users
+                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+
+            user.Image = $"https://localhost:0000/images/{fileName}";
+
+            try
+            {
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor"));
+            }
+
+            return Ok(new ResultViewModel<string>("Imagem alterada com sucesso!", null));
         }
     }
 }
