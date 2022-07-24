@@ -6,13 +6,14 @@ namespace Blog.Data
 {
     public class BlogDataContext : DbContext
     {
+        public BlogDataContext(DbContextOptions<BlogDataContext> options) : base(options)
+        {
+        }
+
         public DbSet<Category> Categories { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer(@"Server = DESKTOP-7AC833D\SQLEXPRESS; Database = blog-modulo-6; Trusted_Connection = True");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
